@@ -229,17 +229,32 @@ with st.sidebar:
 
     try:
 
-        from memory.store import get_memory_count
+        from memory.store import get_memory_count, recall_memories
 
         count = get_memory_count()
 
         st.metric("Stored analyses", count)
 
+        if count > 0:
+            if st.button("View stored analyses", type="secondary", use_container_width=True):
+                st.session_state["show_memories"] = not st.session_state.get("show_memories", False)
+
+            if st.session_state.get("show_memories", False):
+                st.caption("Recent analyses:")
+                search_query = st.text_input("Search memories", placeholder="e.g., Apple, tech stocks...")
+                if search_query:
+                    memories = recall_memories(search_query, n_results=5)
+                    for i, mem in enumerate(memories, 1):
+                        with st.expander(f"Match {i} (score: {mem['distance']:.2f})"):
+                            st.write(mem["content"][:500] + ("..." if len(mem["content"]) > 500 else ""))
+                            if mem["metadata"]:
+                                st.caption(f"Stored: {mem['metadata'].get('timestamp', 'N/A')}")
+
     except Exception:
 
         st.caption("Memory not initialised yet")
 
-    if st.button("Clear memory", type="secondary"):
+    if st.button("Clear memory", type="secondary", width="stretch"):
 
         import shutil
 
