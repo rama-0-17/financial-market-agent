@@ -14,6 +14,7 @@ from __future__ import annotations
 import json
 import uuid
 import hashlib
+import os
 from datetime import datetime
 from typing import Optional
 import chromadb
@@ -25,7 +26,8 @@ from chromadb.config import Settings
 _client: Optional[chromadb.ClientAPI] = None
 _collection: Optional[chromadb.Collection] = None
 
-CHROMA_PATH = "./chroma_db"
+# Use absolute path to support deployed environments
+CHROMA_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "chroma_db")
 COLLECTION_NAME = "fin_agent_memory"
 
 
@@ -73,6 +75,8 @@ class _SimpleEmbeddingFunction:
 def _get_collection() -> chromadb.Collection:
     global _client, _collection
     if _collection is None:
+        # Ensure directory exists (critical for deployed environments)
+        os.makedirs(CHROMA_PATH, exist_ok=True)
         _client = chromadb.PersistentClient(
             path=CHROMA_PATH,
             settings=Settings(anonymized_telemetry=False),

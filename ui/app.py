@@ -229,7 +229,7 @@ with st.sidebar:
 
     try:
 
-        from memory.store import get_memory_count, recall_memories
+        from memory.store import get_memory_count, recall_memories, CHROMA_PATH
 
         count = get_memory_count()
 
@@ -258,9 +258,9 @@ with st.sidebar:
 
         import shutil
 
-        if os.path.exists("./chroma_db"):
+        if os.path.exists(CHROMA_PATH):
 
-            shutil.rmtree("./chroma_db")
+            shutil.rmtree(CHROMA_PATH)
 
         st.success("Memory cleared")
 
